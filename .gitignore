@@ -1,0 +1,43 @@
+# --- Secrets / configuration ---
+config.json
+*config.json
+!config_template.json
+.env
+.env.*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- Upstream Graph of Thoughts library (install via pip, not vendored) ---
+# https://github.com/spcl/graph-of-thoughts
+graph_of_thoughts/
+othercases/
+
+# --- CBT-Bench dataset and derived data ---
+# Not redistributed: the source records are first-person mental-health
+# narratives. Obtain the dataset from its original distributor.
+CBT-Bench/
+cbt/testdata.json
+userinput.json
+answer.json
+
+# --- Run artifacts containing verbatim source narratives ---
+cbt_analysis_results.json
+cbt/cbt_analysis_results.json
+cbt/result.log
+cbt/results/result_*.json
+*.log
+
+# --- Local run artifacts ---
+cbt/results/
+cbt/distortion_eval_results_*.json
+IMPROVEMENTS.md

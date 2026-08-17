@@ -1,0 +1,22 @@
+{
+    "chatgpt": {
+        "model_id": "gpt-4o",
+        "prompt_token_cost": 0.0025,
+        "response_token_cost": 0.01,
+        "temperature": 0.7,
+        "max_tokens": 4096,
+        "stop": null,
+        "organization": "",
+        "api_key": ""
+    },
+    "gpt-4": {
+        "model_id": "gpt-4",
+        "prompt_token_cost": 0.03,
+        "response_token_cost": 0.06,
+        "temperature": 0.7,
+        "max_tokens": 4096,
+        "stop": null,
+        "organization": "",
+        "api_key": ""
+    }
+}
