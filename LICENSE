@@ -1,7 +1,7 @@
 BSD 3-Clause License
 
 Copyright (c) 2023, ETH Zurich
-Copyright (c) 2025, Jingyeong Park
+Copyright (c) 2026, Jin Gyeong Park
 
 All rights reserved.
 
@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-Portions of this project (`cbt/cbt_parser.py`, `cbt/cbt_prompter.py`,
-`cbt/__init__.py`) are derived from the Graph of Thoughts reference
-implementation by ETH Zurich, released under the same BSD 3-Clause License:
-https://github.com/spcl/graph-of-thoughts
+`cbt/pipeline.py` subclasses the Generate and ValidateAndImprove operations
+of the Graph of Thoughts reference implementation by ETH Zurich, and
+ValidateImproveBacktrack._execute follows the structure of the method it
+overrides. That implementation is released under the same BSD 3-Clause
+License: https://github.com/spcl/graph-of-thoughts

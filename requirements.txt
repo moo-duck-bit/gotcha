@@ -1,0 +1,6 @@
+graph-of-thoughts>=0.0.3
+pytest>=7.0
+
+# Optional. Installs torch. Needed only for --similarity sbert, the paper's
+# sentence-BERT measure for definitional alignment.
+# sentence-transformers>=2.2
