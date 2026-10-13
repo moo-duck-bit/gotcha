@@ -33,7 +33,7 @@ Thoughts below $\tau_\text{diag}=0.6$ are refined with dimension-specific feedba
 
 ## Results
 
-F1 on [CBT-BENCH](https://github.com/mianzhang/CBT-Bench) Level II tasks, all models integrated with GoTCHA.
+F1 on [CBT-BENCH](https://github.com/mianzhang/CBT-Bench) Level II tasks, all models integrated with GoTCHA. These are the paper's reported numbers; see [Reference implementation](#reference-implementation) for how this repository relates to the code that produced them.
 
 | Model | CBT-CD | CBT-PC | CBT-FC |
 |---|---|---|---|
@@ -60,23 +60,74 @@ Validate & Improve is the load-bearing component — removing it collapses F1 th
 
 ## Setup
 
-```bash
-pip install graph-of-thoughts openai pandas matplotlib seaborn
-cp config_template.json config.json   # add your API key
-```
+Python 3.10+.
 
 ```bash
-./evaluate_core_beliefs.sh      # CBT-PC
-./evaluate_fine_grained.sh      # CBT-FC
-./evaluate_distortions.sh       # CBT-CD
-./evaluate_datasets.sh --dataset distortions --num-cases 10
+pip install -r requirements.txt
+cp config_template.json config.json   # add your OpenAI API key
 ```
 
-Options: [CBT_EVALUATION_README.md](CBT_EVALUATION_README.md).
+Graph of Thoughts is installed from its GitHub source at a pinned commit: the
+PyPI release (0.0.2) lacks the `language_models` module used here. Upstream
+lists torch and transformers as dependencies, so expect a large install.
+
+## Usage
+
+```bash
+# Check the wiring without an API key: every stage answered by a stub
+python -m cbt.run --level distortions --limit 5 --dry-run
+
+# Run against a model
+python -m cbt.run --level distortions    # CBT-CD
+python -m cbt.run --level core_beliefs   # CBT-PC
+python -m cbt.run --level fine_grained   # CBT-FC
+```
+
+| Option | Default | |
+|---|---|---|
+| `--limit N` | all | first N cases only |
+| `--data-dir` | `CBT-Bench/test` | where the splits live |
+| `--config` / `--model` | `config.json` / `chatgpt` | key in the config file |
+| `--similarity` | `lexical` | `sbert` for the paper's sentence-BERT $q_	ext{def}$ (needs `sentence-transformers`) |
+| `--out FILE` | | write metrics and per-case predictions, with recovery counters, as JSON |
+| `--verbose` | | log each level's validation and recovery |
+
+The run prints micro/macro P, R, F1, exact match, Hamming accuracy and a
+per-label table, plus any labels the model produced outside the taxonomy.
+
+```bash
+pytest   # 171 tests, no API key, network or dataset
+```
+
+The tests drive the full graph from a scripted model, so every recovery path
+(refinement, backtracking, exhausted recovery) is exercised deterministically.
 
 ## Data
 
-CBT-BENCH is **not redistributed here** — the source records are first-person mental-health narratives. Obtain it from the original distributor and place it as `CBT-Bench/{core,fine,distortions}/`. [merge.py](merge.py) joins the splits by `id` into inputs and gold labels.
+CBT-BENCH is **not redistributed here** — the source records are first-person mental-health narratives. Obtain it from the original distributor and place the test splits as:
+
+```
+CBT-Bench/test/
+  core_major_test.json     # CBT-PC, gold field core_belief_major
+  core_fine_test.json      # CBT-FC, gold field core_belief_fine_grained
+  distortions_test.json    # CBT-CD, gold field distortions
+```
+
+[merge.py](merge.py) optionally joins the three splits by `id` into one input file and one gold file, for looking at a case's labels side by side (`python merge.py --out-dir merged`).
+
+## Reference implementation
+
+This repository is a cleaned-up reimplementation of the method, written to be
+readable and testable. It is not the experiment code behind the tables above,
+and running it is not expected to reproduce those numbers exactly. Where it
+differs:
+
+- **Base quality $S_T$** is computed from the parsed thought (category accuracy, conciseness, clarity, consistency, evidence; see `cbt/quality.py`). The original asked the LLM for a 1–10 rating. The quality thresholds $thr_1 = 3.0$, $thr_2 = 5.0$ were calibrated against that rating and are kept for it, but rarely fire against the computed score.
+- **Definitional alignment** defaults to a dependency-free lexical similarity. Pass `--similarity sbert` for the paper's sentence-BERT measure.
+- **CD-Quest examples** are not bundled. `DISTORTION_EXAMPLES` in `cbt/diagnostic.py` is empty, so $q_	ext{def}$ compares against definitions only.
+- **Counter-questions** are a standard CBT thought-record set, not the official worksheet items.
+
+Points where the paper is underspecified, such as gating versus scoring on $q_	ext{coh}$, or how cosine similarity is mapped onto $[0, 1]$, are decided in comments next to the code that implements them, and pinned by tests.
 
 ## Citation
 
@@ -95,4 +146,4 @@ CBT-BENCH is **not redistributed here** — the source records are first-person 
 
 ## License
 
-BSD 3-Clause. Portions of `cbt/cbt_parser.py`, `cbt/cbt_prompter.py`, and `cbt/__init__.py` derive from the ETH Zurich [Graph of Thoughts](https://github.com/spcl/graph-of-thoughts) reference implementation and retain the original copyright notices. See [LICENSE](LICENSE).
+BSD 3-Clause. `cbt/pipeline.py` subclasses operations of the ETH Zurich [Graph of Thoughts](https://github.com/spcl/graph-of-thoughts) reference implementation, released under the same license, whose copyright notice is retained. See [LICENSE](LICENSE).

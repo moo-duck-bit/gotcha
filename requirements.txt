@@ -1,6 +1,10 @@
-graph-of-thoughts>=0.0.3
+# Graph of Thoughts is installed from source. The PyPI release (0.0.2) predates
+# the `language_models` module this code imports and pins openai<1, so it does
+# not work here. The commit is pinned for reproducibility. Note that upstream
+# declares torch and transformers as dependencies, so this pulls them in.
+graph-of-thoughts @ git+https://github.com/spcl/graph-of-thoughts.git@3d9d9dbd8937d47a4441f681b8b40e3c5b054f16
 pytest>=7.0
 
-# Optional. Installs torch. Needed only for --similarity sbert, the paper's
-# sentence-BERT measure for definitional alignment.
+# Optional. Needed only for --similarity sbert, the paper's sentence-BERT
+# measure for definitional alignment.
 # sentence-transformers>=2.2

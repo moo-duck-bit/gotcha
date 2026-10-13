@@ -154,6 +154,14 @@ def test_q_counter_empty_labels_is_zero():
     assert D.q_counter("anything", []) == 0.0
 
 
+def test_q_counter_resolves_paraphrased_labels():
+    rationale = " ".join(D.COUNTER_QUESTIONS["all-or-nothing thinking"])
+    canonical = D.q_counter(rationale, ["all-or-nothing thinking"])
+    assert canonical == pytest.approx(1.0)
+    for paraphrase in ("black-and-white thinking", "All-or-Nothing Thinking"):
+        assert D.q_counter(rationale, [paraphrase]) == pytest.approx(canonical)
+
+
 # --- S_diag ----------------------------------------------------------------
 
 

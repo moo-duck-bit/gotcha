@@ -427,15 +427,19 @@ def q_counter(
 
     A question counts as addressed once its similarity to the rationale clears
     ``threshold``. A label with no question set contributes 0.
+
+    Labels resolve through the same canonicalisation as q_def, so a paraphrase
+    such as "black-and-white thinking" finds the questions of its category.
     """
-    labels = [_norm(x) for x in (labels or ())]
+    labels = list(labels or ())
     if not labels:
         return 0.0
     bank = COUNTER_QUESTIONS if questions is None else questions
 
     total = 0.0
     for label in labels:
-        qs = tuple(bank.get(label, ()) or ())
+        key = _match(label, bank) or _norm(label)
+        qs = tuple(bank.get(key, ()) or ())
         if not qs:
             continue
         total += sum(1 for q in qs if _sim(rationale, q) >= threshold) / len(qs)
